@@ -119,8 +119,7 @@ if st.session_state.is_ended and "start" in st.session_state:
         st.session_state.ans2_val,
         st.session_state.ans3_val,
         st.session_state.ans4_val,
-    )
-
+    
 
 st.divider()
 st.write("นายภูมิภากร เขียวตั๋น เลขที่ 6 ม.4/3")
