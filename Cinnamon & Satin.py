@@ -1,60 +1,62 @@
+import streamlit as st
+
 # --- 1. กำหนดชื่อร้านค้า ---
 shop_name = "Cinnamon & Satin"
-print(f"=== ยินดีต้อนรับสู่ร้าน {shop_name} ===")
+st.title(f"🥐 ร้าน {shop_name}")
+st.subheader("ระบบคิดเงินและคำนวณส่วนลด")
 
-# --- 2. กำหนดราคาสินค้าแต่ละรายการ ---
+# --- 2. แสดงรายการสินค้าและราคา ---
 price_bagel = 30
 price_cake = 50
 price_croissant = 25
 price_cookie = 15
 
-print("\n--- รายการสินค้า ---")
-print(f"1. เบเกิล ({price_bagel} บาท)")
-print(f"2. เค้ก ({price_cake} บาท)")
-print(f"3. ครัวซอง ({price_croissant} บาท)")
-print(f"4. คุกกี้ ({price_cookie} บาท)")
+st.markdown("### 📋 เลือกจำนวนสินค้า")
+col1, col2 = st.columns(2)
 
-# --- รับจำนวนสินค้าแต่ละชนิดจากลูกค้า ---
-print("\nกรุณากรอกจำนวนสินค้าที่ต้องการซื้อ:")
-qty_bagel = int(input("จำนวนเบเกิล (ชิ้น): "))
-qty_cake = int(input("จำนวนเค้ก (ชิ้น): "))
-qty_croissant = int(input("จำนวนครัวซอง (ชิ้น): "))
-qty_cookie = int(input("จำนวนคุกกี้ (ชิ้น): "))
+with col1:
+    qty_bagel = st.number_input(f"เบเกิล ({price_bagel} บาท)", min_value=0, value=0, step=1)
+    qty_cake = st.number_input(f"เค้ก ({price_cake} บาท)", min_value=0, value=0, step=1)
 
-# --- 3. คำนวณราคารวมทั้งหมด ---
+with col2:
+    qty_croissant = st.number_input(f"ครัวซอง ({price_croissant} บาท)", min_value=0, value=0, step=1)
+    qty_cookie = st.number_input(f"คุกกี้ ({price_cookie} บาท)", min_value=0, value=0, step=1)
+
+# --- 3. คำนวณราคารวม ---
 total_price = (qty_bagel * price_bagel) + (qty_cake * price_cake) + (qty_croissant * price_croissant) + (qty_cookie * price_cookie)
 
-# --- 4. เช็กเงื่อนไข If-Else เพื่อคำนวณส่วนลด ---
+# --- 4. เงื่อนไขโปรโมชั่น ---
+st.markdown("---")
+st.markdown("### 🎁 รูปแบบการทาน")
+dine_in = st.radio("เลือกสถานที่ทาน:", ["ทานในร้าน (ลด 10 บาท)", "นำกลับบ้าน"])
+
 discount = 0
 
-# โปรโมชั่น 1: ซื้ออย่างละอย่างน้อย 1 ชิ้น ลดราคา 20 บาท
+# โปรโมชั่น 1: ซื้ออย่างละ 1 ชิ้นขึ้นไป ลด 20 บาท
 if qty_bagel >= 1 and qty_cake >= 1 and qty_croissant >= 1 and qty_cookie >= 1:
     discount += 20
-    print("\n* คุณได้รับส่วนลดโปรโมชั่นซื้อครบทุกอย่าง 20 บาท")
+    st.success("🎉 คุณได้รับส่วนลดโปรโมชั่นซื้อครบทุกอย่าง 20 บาท!")
 
-# โปรโมชั่น 2: ถ้าทานในร้าน ลดราคา 10 บาท
-dine_in = input("ทานในร้านหรือนำกลับบ้าน? (1: ทานในร้าน / 2: นำกลับบ้าน): ").strip()
-if dine_in == '1':
+# โปรโมชั่น 2: ทานในร้าน ลด 10 บาท
+if dine_in == "ทานในร้าน (ลด 10 บาท)":
     discount += 10
-    print("* คุณได้รับส่วนลดทานในร้าน 10 บาท")
 
-# คำนวณราคาสุดธิหลังหักส่วนลด
-final_price = total_price - discount
-if final_price < 0:
-    final_price = 0  # กันกรณีส่วนลดมากกว่าราคาสินค้า
+final_price = max(0, total_price - discount)
 
-# --- 5. แสดงสรุปยอดและรับเงินจากลูกค้าเพื่อคำนวณเงินทอน ---
-print("\n" + "="*35)
-print(f"ราคารวมทั้งหมด: {total_price:.2f} บาท")
-print(f"ส่วนลดรวมที่ได้รับ: {discount:.2f} บาท")
-print(f"ยอดเงินที่ต้องจ่ายจริง: {final_price:.2f} บาท")
-print("="*35)
+# --- 5. แสดงสรุปและคิดเงินทอน ---
+st.markdown("---")
+st.markdown("### 💵 สรุปรายการ")
+st.write(f"**ราคารวมทั้งหมด:** {total_price:.2f} บาท")
+st.write(f"**ส่วนลดรวม:** {discount:.2f} บาท")
+st.markdown(f"### **ยอดที่ต้องจ่ายจริง: {final_price:.2f} บาท**")
 
-cash = float(input("\nกรอกจำนวนเงินที่รับจากลูกค้า: "))
+cash = st.number_input("กรอกจำนวนเงินที่รับจากลูกค้า (บาท):", min_value=0.0, step=10.0)
 
-if cash >= final_price:
-    change = cash - final_price
-    print(f"เงินทอน: {change:.2f} บาท")
-    print(f"\nขอบคุณที่อุดหนุนร้าน {shop_name} ครับ/ค่ะ!")
-else:
-    print(f"จำนวนเงินไม่พอ! ขาดอีก {final_price - cash:.2f} บาท")
+if st.button("คำนวณเงินทอน"):
+    if cash >= final_price:
+        change = cash - final_price
+        st.balloons()
+        st.success(f"💰 เงินทอน: {change:.2f} บาท")
+        st.info(f"ขอบคุณที่อุดหนุนร้าน {shop_name} ครับ/ค่ะ!")
+    else:
+        st.error(f"❌ จำนวนเงินไม่พอ! ขาดอีก {final_price - cash:.2f} บาท")
